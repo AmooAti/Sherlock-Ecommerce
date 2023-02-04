@@ -1,9 +1,64 @@
 {
 	"info": {
-		"_postman_id": "dc4eb5ce-acbb-4ebc-94b6-fe6e23bcddda",
+		"_postman_id": "7b2c7ac5-3bc7-4fba-8310-c9ea8d633878",
 		"name": "Sherlock ECommerce",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "8727103"
+		"_exporter_id": "7684855"
 	},
-	"item": []
+	"item": [
+		{
+			"name": "Customer Register",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"firstname\": \"John\",\n    \"lastname\": \"Doe\",\n    \"email\": \"johndoe@email.com\",\n    \"password\": \"Pass1234\",\n    \"phone_number\": \"09123456789\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/customer/register",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"customer",
+						"register"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://127.0.0.1:8000/api",
+			"type": "string"
+		}
+	]
 }
