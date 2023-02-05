@@ -10,20 +10,6 @@ class Customer extends Model
     use HasFactory;
 
     /**
-     * The table associated with the model.
-     *
-     * @var string
-     */
-    protected $table = 'customers';
-
-    /**
-     * Activates/Deactivates the “created_at” and “updated_at” in the customers' table.
-     *
-     * @var bool
-     */
-    public $timestamps = true;
-
-    /**
      * The attributes that are mass assignable.
      *
      * @var array<int, string>
@@ -33,6 +19,7 @@ class Customer extends Model
         'lastname',
         'email',
         'password',
+        'phone_number',
     ];
 
     /**
