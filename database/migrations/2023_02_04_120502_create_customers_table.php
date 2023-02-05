@@ -17,7 +17,7 @@ return new class extends Migration {
             $table->string('firstname', 255);
             $table->string('lastname', 255);
             $table->string('phone_number', 255)->nullable();
-            $table->string('email', 255);
+            $table->string('email', 255)->unique();
             $table->string('password', 255);
             $table->string('is_suspended')->default('active');
             $table->timestamp('last_login')->nullable();
