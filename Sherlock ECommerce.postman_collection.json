@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "7b2c7ac5-3bc7-4fba-8310-c9ea8d633878",
+		"_postman_id": "14c63de3-ab22-4923-89b3-eff62ad72515",
 		"name": "Sherlock ECommerce",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "7684855"
@@ -40,7 +40,15 @@
 			"script": {
 				"type": "text/javascript",
 				"exec": [
-					""
+					"pm.request.headers.add({",
+					"    key: \"Accept\",",
+					"    value: \"application/json\"",
+					"});",
+					"",
+					"pm.request.headers.add({",
+					"    key: \"Content_type\",",
+					"    value: \"application/json\"",
+					"});"
 				]
 			}
 		},
