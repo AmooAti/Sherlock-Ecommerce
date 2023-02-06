@@ -19,7 +19,7 @@ return new class extends Migration {
             $table->string('phone_number', 255)->nullable();
             $table->string('email', 255)->unique();
             $table->string('password', 255);
-            $table->string('is_suspended')->default('active');
+            $table->enum('is_suspended', ['active', 'deactivate'])->default('active');
             $table->timestamp('last_login')->nullable();
             $table->timestamps();
         });

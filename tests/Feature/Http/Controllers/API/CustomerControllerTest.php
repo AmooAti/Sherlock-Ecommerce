@@ -4,11 +4,13 @@ namespace Tests\Feature\Http\Controllers\API;
 
 use App\Models\Customer;
 use Database\Factories\CustomerFactory;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
 use Tests\TestCase;
 
 class CustomerControllerTest extends TestCase
 {
+    use RefreshDatabase;
     const ROUTE_CUSTOMER_REGISTER = 'customer.register';
 
     /**
