@@ -5,13 +5,16 @@ namespace Tests\Feature\Http\Controllers\API;
 use App\Models\Customer;
 use Database\Factories\CustomerFactory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Str;
 use Tests\TestCase;
 
 class CustomerControllerTest extends TestCase
 {
+    use WithFaker;
     use RefreshDatabase;
     const ROUTE_CUSTOMER_REGISTER = 'customer.register';
+    const ROUTE_CUSTOMER_LOGIN = 'customer.login';
 
     /**
      * An array of fake customer
@@ -120,5 +123,49 @@ class CustomerControllerTest extends TestCase
         unset($this->payload['password']);
 
         $this->assertDatabaseHas('customers', $this->payload);
+    }
+
+    public function test_as_a_customer_with_correct_credential_should_be_able_to_login()
+    {
+        $customer = Customer::factory()->createOne();
+
+        $payload =["email"=>$customer->email, "password"=>"password"];
+
+        $this->postJson(route(self::ROUTE_CUSTOMER_LOGIN),$payload)
+            ->assertSuccessful()->assertJsonStructure([
+                "data"=>  ['token','expires_at']]);
+    }
+
+    public function test_as_a_customer_with_incorrect_email_should_not_be_able_to_login()
+    {
+        $customer = Customer::factory()->createOne();
+
+        $payload =["email"=>'test'.$customer->email, "password"=>"password"];
+
+        $this->postJson(route(self::ROUTE_CUSTOMER_LOGIN),$payload)
+            ->assertUnauthorized()->assertExactJson([
+                "error"=>"The provided credentials are incorrect."]);
+    }
+
+
+    public function test_as_a_customer_with_incorrect_password_should_not_be_able_to_login()
+    {
+        $customer = Customer::factory()->createOne();
+
+        $payload =["email"=>$customer->email, "password"=>"password1"];
+
+        $this->postJson(route(self::ROUTE_CUSTOMER_LOGIN),$payload)
+            ->assertUnauthorized()->assertExactJson([
+                "error"=>"The provided credentials are incorrect."]);
+    }
+
+    public function test_as_a_customer_with_invalid_email_should_not_be_able_to_login()
+    {
+
+
+        $payload =["email"=>$this->faker->firstName(), "password"=>"password1"];
+
+        $this->postJson(route(self::ROUTE_CUSTOMER_LOGIN),$payload)
+            ->assertInvalid(['email']);
     }
 }
