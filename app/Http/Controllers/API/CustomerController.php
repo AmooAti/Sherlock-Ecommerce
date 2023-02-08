@@ -38,7 +38,7 @@ class CustomerController extends Controller
             ->setStatusCode(201);
     }
 
-    public  function login(LoginRequest $request)
+    public  function login(LoginRequest $request):JsonResponse|LoginResource
     {
 
         $credentials =   $request->validated();
@@ -51,5 +51,13 @@ class CustomerController extends Controller
         }
         $token = $customer->createToken('api_token');
         return LoginResource::make($token);
+    }
+
+    public function  logout(Request $request):JsonResponse
+    {
+        $request->user()->currentAccessToken()->delete();
+        return response()
+            ->json(['message' => "The customer logged out successfully."]);
+
     }
 }

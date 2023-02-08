@@ -7,3 +7,5 @@ Route::post('/customer/register', [CustomerController::class, 'register'])->name
 Route::post('/customer/login', [CustomerController::class, 'login'])
     ->name('customer.login');
 
+Route::middleware('auth:sanctum')->get('/customer/logout', [CustomerController::class,'logout'])
+    ->name('customer.logout');
