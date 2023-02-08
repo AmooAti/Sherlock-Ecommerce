@@ -133,9 +133,16 @@ class CustomerControllerTest extends TestCase
 
         $payload =['email'=>$customer->email, 'password'=>'password'];
 
-        $this->postJson(route(self::ROUTE_CUSTOMER_LOGIN),$payload)
+        $data =$this->postJson(route(self::ROUTE_CUSTOMER_LOGIN),$payload)
             ->assertSuccessful()->assertJsonStructure([
-                'data'=>  ['token','expires_at']]);
+                'data'=>  ['token','expires_at']])->json();
+
+        //check last_login not null
+
+        $this->assertDatabaseMissing('customers', [
+            'email'=>$customer->email, 'last_login'=>NULL]);
+
+
     }
 
     public function test_as_a_customer_with_incorrect_email_should_not_be_able_to_login()
