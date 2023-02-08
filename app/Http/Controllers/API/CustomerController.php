@@ -50,6 +50,11 @@ class CustomerController extends Controller
 
         }
         $token = $customer->createToken('api_token');
+        $customer = Customer::find($customer->id);
+//        dd($token);
+        $customer->last_login =$token->accessToken->created_at;
+        $customer->save();
+
         return LoginResource::make($token);
     }
 
