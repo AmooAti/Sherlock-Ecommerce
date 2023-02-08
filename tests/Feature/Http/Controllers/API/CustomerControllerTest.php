@@ -197,7 +197,10 @@ class CustomerControllerTest extends TestCase
         ->assertSuccessful()
         ->assertExactJson(['message'=>  'The customer logged out successfully.']);
 
-        $this->assertDatabaseMissing('personal_access_tokens', $data);
+        $this->assertDatabaseMissing(
+            'personal_access_tokens',
+            ['token' => hash('sha256', explode('|', $token)[1])]
+        );
         /*
            @AmooAti this return 200
              $this->get(route(self::ROUTE_CUSTOMER_LOGOUT),$headers)
