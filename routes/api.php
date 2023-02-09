@@ -3,9 +3,17 @@
 use App\Http\Controllers\API\CustomerController;
 use Illuminate\Support\Facades\Route;
 
-Route::post('/customer/register', [CustomerController::class, 'register'])->name('customer.register');
-Route::post('/customer/login', [CustomerController::class, 'login'])
-    ->name('customer.login');
 
-Route::middleware('auth:sanctum')->get('/customer/logout', [CustomerController::class,'logout'])
-    ->name('customer.logout');
+Route::prefix('customer')->name('customer.')
+    ->group(function(){
+        Route::post('/register', [CustomerController::class, 'register'])
+            ->name('register');
+        Route::post('/login', [CustomerController::class, 'login'])
+            ->name('login');
+        Route::get('/logout', [CustomerController::class,'logout'])
+            ->middleware('auth:sanctum')
+            ->name('logout');
+});
+
+
+
