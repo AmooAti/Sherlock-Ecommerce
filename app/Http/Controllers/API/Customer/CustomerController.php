@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Http\Controllers\API;
+namespace App\Http\Controllers\API\Customer;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\API\RegisterCustomerRequest;
+use App\Http\Requests\API\Customer\RegisterCustomerRequest;
 use App\Models\Customer;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Hash;

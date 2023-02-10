@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\Http\Controllers\API;
+namespace Tests\Feature\Http\Controllers\API\Customer;
 
 use App\Models\Customer;
 use Database\Factories\CustomerFactory;
@@ -11,6 +11,7 @@ use Tests\TestCase;
 class CustomerControllerTest extends TestCase
 {
     use RefreshDatabase;
+
     const ROUTE_CUSTOMER_REGISTER = 'customer.register';
 
     /**
