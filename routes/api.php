@@ -1,19 +1,26 @@
 <?php
 
-use App\Http\Controllers\API\CustomerController;
+use App\Http\Controllers\API\Admin\CustomerController as AdminCustomerController;
+use App\Http\Controllers\API\Customer\CustomerController;
 use Illuminate\Support\Facades\Route;
 
+// Admin action routes.
+Route::prefix('admin')->name('admin.customer.')
+    // ->middleware(['auth:sanctum'])
+    ->controller(AdminCustomerController::class)
+    ->group(function () {
+        Route::post('/customer', 'store')->name('store');
+    });
 
+// Customer action routes.
 Route::prefix('customer')->name('customer.')
-    ->group(function(){
-        Route::post('/register', [CustomerController::class, 'register'])
-            ->name('register');
-        Route::post('/login', [CustomerController::class, 'login'])
-            ->name('login');
-        Route::get('/logout', [CustomerController::class,'logout'])
-            ->middleware('auth:sanctum')
-            ->name('logout');
-});
+    ->controller(CustomerController::class)
+    ->group(function () {
+        Route::post('/register', 'store')->name('register');
+        Route::post('/login', 'login')->name('login');
+        Route::get('/logout', 'logout')
+            ->middleware('auth:sanctum')->name('logout');
+    });
 
 
 
