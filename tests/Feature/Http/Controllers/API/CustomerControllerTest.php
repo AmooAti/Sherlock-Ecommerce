@@ -5,13 +5,19 @@ namespace Tests\Feature\Http\Controllers\API;
 use App\Models\Customer;
 use Database\Factories\CustomerFactory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Tests\TestCase;
+use function PHPUnit\Framework\assertTrue;
 
 class CustomerControllerTest extends TestCase
 {
-    use RefreshDatabase;
+    use WithFaker, RefreshDatabase;
+
     const ROUTE_CUSTOMER_REGISTER = 'customer.register';
+    const ROUTE_CUSTOMER_LOGIN = 'customer.login';
+    const ROUTE_CUSTOMER_LOGOUT = 'customer.logout';
 
     /**
      * An array of fake customer
@@ -120,5 +126,119 @@ class CustomerControllerTest extends TestCase
         unset($this->payload['password']);
 
         $this->assertDatabaseHas('customers', $this->payload);
+    }
+
+    public function test_as_a_customer_with_correct_credential_should_be_able_to_login()
+    {
+        $customer = Customer::factory()->createOne();
+
+        $payload = ['email' => $customer->email, 'password' => 'password'];
+
+        $data = $this->postJson(route(self::ROUTE_CUSTOMER_LOGIN), $payload)
+            ->assertSuccessful()->assertJsonStructure([
+                'data' => ['token', 'expires_at']])->json();
+
+        //check last_login not null
+
+        $this->assertDatabaseMissing('customers', [
+            'email' => $customer->email, 'last_login' => NULL]);
+
+
+    }
+
+    public function test_as_a_customer_with_incorrect_email_should_not_be_able_to_login()
+    {
+        $customer = Customer::factory()->createOne();
+
+        $payload = ['email' => 'test' . $customer->email, 'password' => 'password'];
+
+        $this->postJson(route(self::ROUTE_CUSTOMER_LOGIN), $payload)
+            ->assertUnauthorized()->assertExactJson([
+                'error' => 'The provided credentials are incorrect.']);
+    }
+
+
+    public function test_as_a_customer_with_incorrect_password_should_not_be_able_to_login()
+    {
+        $customer = Customer::factory()->createOne();
+
+        $payload = ['email' => $customer->email, 'password' => "password1"];
+
+        $this->postJson(route(self::ROUTE_CUSTOMER_LOGIN), $payload)
+            ->assertUnauthorized()->assertExactJson([
+                'error' => 'The provided credentials are incorrect.']);
+    }
+
+    public function test_as_a_customer_with_invalid_email_should_not_be_able_to_login()
+    {
+
+        $payload = ['email' => $this->faker->firstName(), 'password' => "password1"];
+
+        $this->postJson(route(self::ROUTE_CUSTOMER_LOGIN), $payload)
+            ->assertInvalid(['email']);
+    }
+
+
+    public function test_as_a_loggedIn_customer_with_valid_token_should_be_able_to_logout()
+    {
+        $customer = Customer::factory()->createOne();
+        $token = $customer->createToken('Test Token')->plainTextToken;
+        $headers = [
+            'Authorization' => 'Bearer ' . $token,
+            'Accept' => ' application/json',
+        ];
+
+
+        $this->get(route(self::ROUTE_CUSTOMER_LOGOUT), $headers)
+            ->assertSuccessful()
+            ->assertExactJson(['message' => 'The customer logged out successfully.']);
+
+
+        $this->assertDatabaseMissing(
+            'personal_access_tokens',
+            ['id' => explode('|', $token[0])]
+        );
+
+        $this->assertDatabaseCount('personal_access_tokens', 0);
+    }
+
+    public function test_logout_returns_unauthenticated_when_token_is_not_present()
+    {
+        $this->get(route(self::ROUTE_CUSTOMER_LOGOUT), [
+            'Accept' => 'application/json'
+        ])->assertUnauthorized();
+    }
+
+    public function test_logout_returns_unauthenticated_when_token_is_invalid()
+    {
+        $this->getJson(route(self::ROUTE_CUSTOMER_LOGOUT), [
+            'Authorization' => 'Bearer 1|ajshdhfkajsdfhqwier'
+        ])->assertUnauthorized();
+    }
+
+    public function test_as_a_logged_out_customer_should_be_authorized_with_other_token()
+    {
+
+        $customer = Customer::factory()->createOne();
+        $payload = ['email' => $customer->email, 'password' => 'password'];
+
+        $response1 = $this->postJson(route(self::ROUTE_CUSTOMER_LOGIN), $payload);
+        $data1 = $response1->decodeResponseJson()['data'];
+        $token1 = $data1["token"];
+
+        $response2 = $this->postJson(route(self::ROUTE_CUSTOMER_LOGIN), $payload);
+        $data2 = $response1->decodeResponseJson()['data'];
+        $token2 = $data2["token"];
+
+        $headers = [
+            'HTTP_Authorization' => 'Bearer ' . $token1,
+            'Accept' => ' application/json'
+        ];
+        $this->get(route(self::ROUTE_CUSTOMER_LOGOUT), $headers);
+        $this->getJson(route(self::ROUTE_CUSTOMER_LOGOUT,
+            ['HTTP_Authorization' => 'Bearer ' . $token1]))
+            ->assertSuccessful();
+
+
     }
 }
