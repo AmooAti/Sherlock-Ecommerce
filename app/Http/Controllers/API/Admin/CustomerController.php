@@ -28,7 +28,7 @@ class CustomerController extends Controller
             'email'        => $request->get('email'),
             'password'     => Hash::make($request->get('password')),
             'phone_number' => $request->get('phone_number'),
-            'is_suspended' => $request->get('is_suspended') ?? 'active',
+            'is_suspended' => $request->get('is_suspended'),
         ]);
 
         return CustomerResource::collection([$customer]);
