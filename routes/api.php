@@ -9,6 +9,7 @@ Route::prefix('admin')->name('admin.customer.')
     // ->middleware(['auth:sanctum'])
     ->controller(AdminCustomerController::class)
     ->group(function () {
+        Route::get('/customers', 'index')->name('index');
         Route::post('/customer', 'store')->name('store');
     });
 
