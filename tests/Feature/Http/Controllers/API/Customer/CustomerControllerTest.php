@@ -1,15 +1,13 @@
 <?php
 
-namespace Tests\Feature\Http\Controllers\API;
+namespace Tests\Feature\Http\Controllers\API\Customer;
 
 use App\Models\Customer;
 use Database\Factories\CustomerFactory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Tests\TestCase;
-use function PHPUnit\Framework\assertTrue;
 
 class CustomerControllerTest extends TestCase
 {
@@ -138,12 +136,8 @@ class CustomerControllerTest extends TestCase
             ->assertSuccessful()->assertJsonStructure([
                 'data' => ['token', 'expires_at']])->json();
 
-        //check last_login not null
-
         $this->assertDatabaseMissing('customers', [
             'email' => $customer->email, 'last_login' => NULL]);
-
-
     }
 
     public function test_as_a_customer_with_incorrect_email_should_not_be_able_to_login()
@@ -154,7 +148,8 @@ class CustomerControllerTest extends TestCase
 
         $this->postJson(route(self::ROUTE_CUSTOMER_LOGIN), $payload)
             ->assertUnauthorized()->assertExactJson([
-                'error' => 'The provided credentials are incorrect.']);
+                'error' => 'The provided credentials are incorrect.',
+            ]);
     }
 
 
@@ -166,12 +161,12 @@ class CustomerControllerTest extends TestCase
 
         $this->postJson(route(self::ROUTE_CUSTOMER_LOGIN), $payload)
             ->assertUnauthorized()->assertExactJson([
-                'error' => 'The provided credentials are incorrect.']);
+                'error' => 'The provided credentials are incorrect.',
+            ]);
     }
 
     public function test_as_a_customer_with_invalid_email_should_not_be_able_to_login()
     {
-
         $payload = ['email' => $this->faker->firstName(), 'password' => "password1"];
 
         $this->postJson(route(self::ROUTE_CUSTOMER_LOGIN), $payload)
@@ -185,14 +180,12 @@ class CustomerControllerTest extends TestCase
         $token = $customer->createToken('Test Token')->plainTextToken;
         $headers = [
             'Authorization' => 'Bearer ' . $token,
-            'Accept' => ' application/json',
+            'Accept'        => ' application/json',
         ];
-
 
         $this->get(route(self::ROUTE_CUSTOMER_LOGOUT), $headers)
             ->assertSuccessful()
             ->assertExactJson(['message' => 'The customer logged out successfully.']);
-
 
         $this->assertDatabaseMissing(
             'personal_access_tokens',
@@ -205,20 +198,19 @@ class CustomerControllerTest extends TestCase
     public function test_logout_returns_unauthenticated_when_token_is_not_present()
     {
         $this->get(route(self::ROUTE_CUSTOMER_LOGOUT), [
-            'Accept' => 'application/json'
+            'Accept' => 'application/json',
         ])->assertUnauthorized();
     }
 
     public function test_logout_returns_unauthenticated_when_token_is_invalid()
     {
         $this->getJson(route(self::ROUTE_CUSTOMER_LOGOUT), [
-            'Authorization' => 'Bearer 1|ajshdhfkajsdfhqwier'
+            'Authorization' => 'Bearer 1|ajshdhfkajsdfhqwier',
         ])->assertUnauthorized();
     }
 
     public function test_as_a_logged_out_customer_should_be_authorized_with_other_token()
     {
-
         $customer = Customer::factory()->createOne();
         $payload = ['email' => $customer->email, 'password' => 'password'];
 
@@ -232,13 +224,12 @@ class CustomerControllerTest extends TestCase
 
         $headers = [
             'HTTP_Authorization' => 'Bearer ' . $token1,
-            'Accept' => ' application/json'
+            'Accept'             => ' application/json',
         ];
+
         $this->get(route(self::ROUTE_CUSTOMER_LOGOUT), $headers);
         $this->getJson(route(self::ROUTE_CUSTOMER_LOGOUT,
             ['HTTP_Authorization' => 'Bearer ' . $token1]))
             ->assertSuccessful();
-
-
     }
 }

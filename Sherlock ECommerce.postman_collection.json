@@ -1,43 +1,16 @@
 {
 	"info": {
-		"_postman_id": "ea10c044-529c-462c-85ab-a644b9ed0b4e",
+		"_postman_id": "52520687-29be-4757-b158-b1f093b98e59",
 		"name": "Sherlock ECommerce",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "3872557"
+		"_exporter_id": "7684855"
 	},
 	"item": [
 		{
 			"name": "Customer",
 			"item": [
 				{
-					"name": "Customer Register",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"firstname\": \"John\",\n    \"lastname\": \"Doe\",\n    \"email\": \"johndoe@email.com\",\n    \"password\": \"Pass1234\",\n    \"phone_number\": \"09123456789\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{base_url}}/customer/register",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"customer",
-								"register"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Customer Login",
+					"name": "Login",
 					"event": [
 						{
 							"listen": "prerequest",
@@ -53,7 +26,6 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"\r",
 									""
 								],
 								"type": "text/javascript"
@@ -86,7 +58,7 @@
 					"response": []
 				},
 				{
-					"name": "Customer Logout",
+					"name": "Logout",
 					"event": [
 						{
 							"listen": "prerequest",
@@ -102,7 +74,6 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.request.headers.add(\"Accept: application/json\");\r",
 									""
 								],
 								"type": "text/javascript"
@@ -115,7 +86,7 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "7|IDLRVpbBi0B3tEsBSb9mDp7jV81a6t3a107I8urF",
+									"value": "5|7tITIFtpWqD9vSEY99oJXMVL6Vlwvk9WT0RXP9Sl",
 									"type": "string"
 								}
 							]
@@ -134,6 +105,192 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Register",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"firstname\": \"John\",\n    \"lastname\": \"Doe\",\n    \"email\": \"johndoe@email.com\",\n    \"password\": \"Pass1234\",\n    \"phone_number\": \"09123456789\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/customer/register",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"customer",
+								"register"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Admin",
+			"item": [
+				{
+					"name": "Customer",
+					"item": [
+						{
+							"name": "Create",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"firstname\": \"John\",\n    \"lastname\": \"Doe\",\n    \"email\": \"johndoe@email.com\",\n    \"password\": \"Pass1234\",\n    \"phone_number\": \"09123456789\",\n    \"is_suspended\": \"deactivate\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/admin/customer",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"admin",
+										"customer"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Edit",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"firstname\": \"John\",\n    \"lastname\": \"Doe\",\n    \"email\": \"johndoe@email.com\",\n    \"password\": \"Pass1234\",\n    \"phone_number\": \"09123456789\",\n    \"is_suspended\": \"active\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/admin/customer/1",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"admin",
+										"customer",
+										"1"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/admin/customer/1",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"admin",
+										"customer",
+										"1"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "List",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"page\": 2,\n    \"limit\": 3\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/admin/customers",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"admin",
+										"customers"
+									]
+								}
+							},
+							"response": []
+						}
+					]
 				}
 			]
 		}
