@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\API\Admin\CreateCustomerRequest;
+use App\Http\Requests\API\Admin\UpdateCustomerRequest;
 use App\Http\Resources\API\Admin\CustomerResource;
 use App\Models\Customer;
 use Illuminate\Http\JsonResponse;
@@ -48,5 +49,28 @@ class CustomerController extends Controller
         ]);
 
         return CustomerResource::make($customer);
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param UpdateCustomerRequest $request
+     * @param Customer              $customer
+     *
+     * @return jsonResponse
+     */
+    public function update(UpdateCustomerRequest $request, Customer $customer): JsonResponse
+    {
+        $request->validated();
+
+        $params = $request->all();
+
+        if (array_key_exists('password', $params)) {
+            $params['password'] = Hash::make($request->get('password'));
+        }
+
+        $customer->update($params);
+
+        return response()->json($customer);
     }
 }
