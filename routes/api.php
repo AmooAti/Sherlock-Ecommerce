@@ -11,6 +11,7 @@ Route::prefix('admin')->name('admin.customer.')
     ->group(function () {
         Route::post('/customer', 'store')->name('store');
         Route::get('/customers', 'index')->name('index');
+        Route::put('/customer/{customer}', 'update')->name('update');
     });
 
 // Customer action routes.
