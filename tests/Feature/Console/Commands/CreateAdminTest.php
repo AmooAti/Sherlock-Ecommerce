@@ -9,7 +9,8 @@ use Tests\TestCase;
 
 class CreateAdminTest extends TestCase
 {
-    use WithFaker;
+    use WithFaker, RefreshDatabase;
+
     /**
      * A basic feature test example.
      *
@@ -19,12 +20,13 @@ class CreateAdminTest extends TestCase
     {
 
         $payload = [
-          "email"=>$this->faker->email(),
-          "password"=>$this->faker->password(8)
+            "email" => $this->faker->email(),
+            "password" => $this->faker->password(8)
         ];
 
-        $command= sprintf('make:admin %s %s', $payload["email"],$payload["password"]);
-        $this->artisan($command)->assertSuccessful();
+
+        $this->artisan('make:admin', $payload)
+            ->assertSuccessful();
         unset($payload['password']);
         $this->assertDatabaseHas('admins', $payload);
     }
@@ -34,11 +36,12 @@ class CreateAdminTest extends TestCase
     {
 
         $payload = [
-            "email"=>$this->faker->email(),
+            "email" => $this->faker->email(),
         ];
 
-        $command= sprintf('make:admin %s', $payload["email"]);
-        $this->artisan($command)->assertSuccessful();
+
+        $this->artisan('make:admin', $payload)
+            ->assertSuccessful();
         $this->assertDatabaseHas('admins', $payload);
     }
 
@@ -46,38 +49,44 @@ class CreateAdminTest extends TestCase
     {
 
         $payload = [
-            "email"=>$this->faker->firstName(),
+            "email" => $this->faker->firstName(),
         ];
 
-        $command= sprintf('make:admin %s', $payload["email"]);
-        $this->artisan($command)->assertExitCode(0);
-        $this->assertDatabaseHas('admins', $payload);
+        $command = sprintf('make:admin %s', $payload["email"]);
+        $this->artisan($command)
+            ->expectsOutputToContain('The email must be a valid email address.')
+            ->assertExitCode(1);
+        $this->assertDatabaseMissing('admins', $payload);
     }
 
-//    public function test_as_an_admin_should_be_register_with_invalid_password()
-//    {
-//
-//        $payload = [
-//            "email"=>$this->faker->firstName(),
-//        ];
-//
-//        $command= sprintf('make:admin %s', $payload["email"]);
-//        $this->artisan($command)->assertExitCode(0);
-//        $this->assertDatabaseMissing('admins', $payload);
-//    }
+    public function test_as_an_admin_should_not_be_register_with_invalid_password()
+    {
+
+        $payload = [
+            "email" => $this->faker->email(),
+            "password" => "1234"
+        ];
+
+        $this->artisan('make:admin', $payload)
+            ->expectsOutputToContain(
+                'The password must contain at least one uppercase and one lowercase letter.')
+            ->expectsOutputToContain('The password must be at least 8 characters')
+            ->assertExitCode(1);
+
+        $this->assertDatabaseMissing('admins', $payload);
+    }
 
 
     public function test_as_an_admin_it_can_not_register_with_duplicated_email()
     {
 
         $user = Admin::factory()->create();
-        $payload =[
-            "email"=> $user->email,
-            "password"=>$this->faker->password(8),
+        $payload = [
+            "email" => $user->email,
+            "password" => $this->faker->password(8),
         ];
-        $command = sprintf('make:admin %s %s',
-            $payload["email"],
-            $payload["password"]);
-        $this->artisan($command) ->assertExitCode(0);
+        $this->artisan('make:admin', $payload)
+            ->expectsOutputToContain('The email has already been taken.')
+            ->assertExitCode(1);
     }
 }
