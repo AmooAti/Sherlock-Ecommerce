@@ -42,7 +42,7 @@ class CreateAdmin extends Command
 
         Admin::create([
             'email'        => $email,
-            'password'     => $password,
+            'password'     =>Hash::make($password),
         ]);
         echo "Finished";
         return Command::SUCCESS;
