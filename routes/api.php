@@ -12,6 +12,7 @@ Route::prefix('admin')->name('admin.customer.')
         Route::post('/customer', 'store')->name('store');
         Route::get('/customers', 'index')->name('index');
         Route::put('/customer/{customer}', 'update')->name('update');
+        Route::delete('/customer/{customer}', 'destroy')->name('destroy');
     });
 
 // Customer action routes.
