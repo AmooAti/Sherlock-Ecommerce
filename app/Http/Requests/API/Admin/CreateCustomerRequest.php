@@ -32,7 +32,6 @@ class CreateCustomerRequest extends FormRequest
             'password'     => ['required', 'string', Password::min(8)->numbers()->mixedCase()],
             'phone_number' => ['nullable', 'string'],
             'is_suspended' => ['nullable', 'string'],
-            'last_login'   => ['nullable'],
         ];
     }
 }
