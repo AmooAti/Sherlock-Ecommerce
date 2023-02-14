@@ -12,6 +12,47 @@ class CustomerControllerTest extends TestCase
 {
     use WithFaker, RefreshDatabase;
 
+    const ADMIN_CUSTOMER_STORE = 'admin.customer.store';
+    const ADMIN_CUSTOMER_INDEX = 'admin.customer.index';
+
+    /**
+     * Test as an admin, it should get the count of customers equal to the limit variable exactly
+     *
+     * @return void
+     */
+    public function test_as_an_admin_it_should_get_the_count_of_customers_equal_to_the_limit_variable_exactly(): void
+    {
+        $page = 1;
+        $limit = 3;
+        $count = 30;
+
+        $customers = Customer::factory()->count($count)->create();
+
+        $payload = $customers->forPage($page, $limit)->toArray();
+
+        $this->assertTrue($limit === count($payload));
+    }
+
+    /**
+     * Test as an admin, it should get all customers
+     *
+     * @return void
+     */
+    public function test_as_an_admin_it_should_get_all_customers(): void
+    {
+        $count = 30;
+
+        Customer::factory()->count($count)->create();
+
+        $this->getJson(
+            route(self::ADMIN_CUSTOMER_INDEX),
+            [
+                'Accept'       => 'application/json',
+                'Content_Type' => 'application/json',
+            ]
+        )->assertJsonCount($count, 'customers');
+    }
+
     /**
      * Test as an admin, it should not create a customer with a password that has not lowercase.
      *
@@ -28,7 +69,7 @@ class CustomerControllerTest extends TestCase
             'is_suspended' => $this->faker->randomElement(['active', 'deactivate']),
         ];
 
-        $this->postJson(route('admin.customer.store'), $payload)
+        $this->postJson(route(self::ADMIN_CUSTOMER_STORE), $payload)
             ->assertInvalid('password');
     }
 
@@ -48,7 +89,7 @@ class CustomerControllerTest extends TestCase
             'is_suspended' => $this->faker->randomElement(['active', 'deactivate']),
         ];
 
-        $this->postJson(route('admin.customer.store'), $payload)
+        $this->postJson(route(self::ADMIN_CUSTOMER_STORE), $payload)
             ->assertInvalid('password');
     }
 
@@ -68,7 +109,7 @@ class CustomerControllerTest extends TestCase
             'is_suspended' => $this->faker->randomElement(['active', 'deactivate']),
         ];
 
-        $this->postJson(route('admin.customer.store'), $payload)
+        $this->postJson(route(self::ADMIN_CUSTOMER_STORE), $payload)
             ->assertInvalid('password');
     }
 
@@ -88,7 +129,7 @@ class CustomerControllerTest extends TestCase
             'is_suspended' => $this->faker->randomElement(['active', 'deactivate']),
         ];
 
-        $this->postJson(route('admin.customer.store'), $payload)
+        $this->postJson(route(self::ADMIN_CUSTOMER_STORE), $payload)
             ->assertInvalid('password');
     }
 
@@ -110,7 +151,7 @@ class CustomerControllerTest extends TestCase
             'is_suspended' => $this->faker->randomElement(['active', 'deactivate']),
         ];
 
-        $this->postJson(route('admin.customer.store'), $payload)
+        $this->postJson(route(self::ADMIN_CUSTOMER_STORE), $payload)
             ->assertInvalid('email');
     }
 
@@ -130,7 +171,7 @@ class CustomerControllerTest extends TestCase
             'is_suspended' => $this->faker->randomElement(['active', 'deactivate']),
         ];
 
-        $this->postJson(route('admin.customer.store'), $payload)
+        $this->postJson(route(self::ADMIN_CUSTOMER_STORE), $payload)
             ->assertInvalid('email');
     }
 
@@ -150,7 +191,7 @@ class CustomerControllerTest extends TestCase
             'is_suspended' => $this->faker->randomElement(['active', 'deactivate']),
         ];
 
-        $this->postJson(route('admin.customer.store'), $payload)
+        $this->postJson(route(self::ADMIN_CUSTOMER_STORE), $payload)
             ->assertInvalid(['firstname', 'lastname', 'email', 'password']);
     }
 
@@ -170,7 +211,7 @@ class CustomerControllerTest extends TestCase
             'is_suspended' => rand(4, 12),
         ];
 
-        $this->postJson(route('admin.customer.store'), $payload)
+        $this->postJson(route(self::ADMIN_CUSTOMER_STORE), $payload)
             ->assertInvalid(['firstname', 'lastname', 'email', 'password', 'phone_number', 'is_suspended']);
     }
 
@@ -190,7 +231,7 @@ class CustomerControllerTest extends TestCase
             'is_suspended' => $this->faker->randomElement(['active', 'deactivate']),
         ];
 
-        $this->postJson(route('admin.customer.store'), $payload)
+        $this->postJson(route(self::ADMIN_CUSTOMER_STORE), $payload)
             ->assertSuccessful();
 
         unset($payload['password']);
