@@ -15,6 +15,33 @@ class CustomerControllerTest extends TestCase
     const ADMIN_CUSTOMER_STORE = 'admin.customer.store';
     const ADMIN_CUSTOMER_INDEX = 'admin.customer.index';
     const ADMIN_CUSTOMER_UPDATE = 'admin.customer.update';
+    const ADMIN_CUSTOMER_DESTROY = 'admin.customer.destroy';
+
+    /**
+     * Test as an admin, it should delete a customer
+     *
+     * @return void
+     */
+    public function test_as_an_admin_it_should_delete_a_customer(): void
+    {
+        $customer = Customer::factory()->createOne(
+            [
+                'firstname'    => $this->faker->firstName,
+                'lastname'     => $this->faker->lastName,
+                'email'        => $this->faker->safeEmail,
+                'password'     => Hash::make($this->faker->password(8)),
+                'phone_number' => $this->faker->phoneNumber,
+                'is_suspended' => $this->faker->randomElement(['active', 'deactivate']),
+            ]
+        );
+
+        $customerID = $customer->getAttribute('id');
+
+        $this->deleteJson(route(self::ADMIN_CUSTOMER_DESTROY, [$customerID]))
+            ->assertSuccessful();
+
+        $this->assertDatabaseMissing('customers', $customer->toArray());
+    }
 
     /**
      * Test as an admin, It should not edit a customer with a password without lowercase.
@@ -239,7 +266,7 @@ class CustomerControllerTest extends TestCase
             'firstname'    => $this->faker->firstName,
             'lastname'     => $this->faker->lastName,
             'email'        => $this->faker->safeEmail,
-            'password'     => $this->faker->password(8),
+            'password'     => 'Pass1234',
             'phone_number' => $this->faker->phoneNumber,
             'is_suspended' => $this->faker->randomElement(['active', 'deactivate']),
         ];
@@ -379,7 +406,7 @@ class CustomerControllerTest extends TestCase
             'firstname'    => $this->faker->firstName(),
             'lastname'     => $this->faker->lastName(),
             'email'        => $customer->getAttribute('email'),
-            'password'     => $this->faker->password(8),
+            'password'     => 'Pass1234',
             'phone_number' => $this->faker->phoneNumber(),
             'is_suspended' => $this->faker->randomElement(['active', 'deactivate']),
         ];
@@ -399,7 +426,7 @@ class CustomerControllerTest extends TestCase
             'firstname'    => $this->faker->firstName,
             'lastname'     => $this->faker->lastName,
             'email'        => $this->faker->name,
-            'password'     => $this->faker->password(8),
+            'password'     => 'Pass1234',
             'phone_number' => $this->faker->phoneNumber,
             'is_suspended' => $this->faker->randomElement(['active', 'deactivate']),
         ];
@@ -459,7 +486,7 @@ class CustomerControllerTest extends TestCase
             'firstname'    => $this->faker->firstName,
             'lastname'     => $this->faker->lastName,
             'email'        => $this->faker->unique()->safeEmail,
-            'password'     => $this->faker->password(8),
+            'password'     => 'Pass1234',
             'phone_number' => $this->faker->phoneNumber,
             'is_suspended' => $this->faker->randomElement(['active', 'deactivate']),
         ];
