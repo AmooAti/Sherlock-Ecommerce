@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use App\Models\Customer;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Facades\Hash;
 
 /**
  * @extends Factory<Customer>
@@ -18,11 +19,11 @@ class CustomerFactory extends Factory
     public function definition(): array
     {
         return [
-            'firstname'    => fake()->firstName(),
-            'lastname'     => fake()->lastName(),
-            'phone_number' => fake()->phoneNumber(),
+            'firstname'    => fake()->firstName,
+            'lastname'     => fake()->lastName,
             'email'        => fake()->unique()->safeEmail(),
-            'password'     => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password,
+            'password'     => Hash::make('password'),
+            'phone_number' => fake()->phoneNumber,
         ];
     }
 }
