@@ -5,7 +5,6 @@ namespace Tests\Feature\Http\Controllers\API\Admin;
 use App\Models\Customer;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
-use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
 
 class CustomerControllerTest extends TestCase
@@ -18,29 +17,50 @@ class CustomerControllerTest extends TestCase
     const ADMIN_CUSTOMER_DESTROY = 'admin.customer.destroy';
 
     /**
+     * A single instance of the model
+     *
+     * @var Customer
+     */
+    private Customer $payload;
+
+    /**
+     * A single model for persistence in the database
+     *
+     * @var Customer
+     */
+    private Customer $customer;
+
+    /**
+     * Setup the test environment
+     *
+     * @return void
+     */
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->payload = Customer::factory()->makeOne([
+            'password'     => 'Pass1234',
+            'is_suspended' => $this->faker->randomElement(['active', 'deactivate']),
+        ]);
+
+        $this->customer = Customer::factory()->createOne([
+            'is_suspended' => $this->faker->randomElement(['active', 'deactivate']),
+        ]);
+    }
+
+    /**
      * Test as an admin, it should delete a customer
      *
      * @return void
      */
     public function test_as_an_admin_it_should_delete_a_customer(): void
     {
-        $customer = Customer::factory()->createOne(
-            [
-                'firstname'    => $this->faker->firstName,
-                'lastname'     => $this->faker->lastName,
-                'email'        => $this->faker->safeEmail,
-                'password'     => Hash::make($this->faker->password(8)),
-                'phone_number' => $this->faker->phoneNumber,
-                'is_suspended' => $this->faker->randomElement(['active', 'deactivate']),
-            ]
-        );
+        $this->deleteJson(
+            route(self::ADMIN_CUSTOMER_DESTROY, [$this->customer->id])
+        )->assertSuccessful();
 
-        $customerID = $customer->getAttribute('id');
-
-        $this->deleteJson(route(self::ADMIN_CUSTOMER_DESTROY, [$customerID]))
-            ->assertSuccessful();
-
-        $this->assertDatabaseMissing('customers', $customer->toArray());
+        $this->assertDatabaseMissing('customers', $this->customer->toArray());
     }
 
     /**
@@ -50,25 +70,10 @@ class CustomerControllerTest extends TestCase
      */
     public function test_as_an_admin_it_should_not_edit_a_customer_with_a_password_without_lowercase(): void
     {
-        $customer = Customer::factory()->createOne(
-            [
-                'firstname'    => $this->faker->firstName,
-                'lastname'     => $this->faker->lastName,
-                'email'        => $this->faker->safeEmail,
-                'password'     => Hash::make($this->faker->password(8)),
-                'phone_number' => $this->faker->phoneNumber,
-                'is_suspended' => $this->faker->randomElement(['active', 'deactivate']),
-            ]
-        );
-
-        $customerID = $customer->getAttribute('id');
-
-        $payload = [
-            'password' => strtoupper($this->faker->password(8)),
-        ];
-
-        $this->putJson(route(self::ADMIN_CUSTOMER_UPDATE, [$customerID]), $payload)
-            ->assertInvalid('password');
+        $this->putJson(
+            route(self::ADMIN_CUSTOMER_UPDATE, [$this->customer->id]),
+            ['password' => strtoupper($this->faker->password(8))]
+        )->assertInvalid('password');
     }
 
     /**
@@ -78,25 +83,10 @@ class CustomerControllerTest extends TestCase
      */
     public function test_as_an_admin_it_should_not_edit_a_customer_with_a_password_without_uppercase(): void
     {
-        $customer = Customer::factory()->createOne(
-            [
-                'firstname'    => $this->faker->firstName,
-                'lastname'     => $this->faker->lastName,
-                'email'        => $this->faker->safeEmail,
-                'password'     => Hash::make($this->faker->password(8)),
-                'phone_number' => $this->faker->phoneNumber,
-                'is_suspended' => $this->faker->randomElement(['active', 'deactivate']),
-            ]
-        );
-
-        $customerID = $customer->getAttribute('id');
-
-        $payload = [
-            'password' => strtolower($this->faker->password(8)),
-        ];
-
-        $this->putJson(route(self::ADMIN_CUSTOMER_UPDATE, [$customerID]), $payload)
-            ->assertInvalid('password');
+        $this->putJson(
+            route(self::ADMIN_CUSTOMER_UPDATE, [$this->customer->id]),
+            ['password' => strtolower($this->faker->password(8))]
+        )->assertInvalid('password');
     }
 
     /**
@@ -106,25 +96,10 @@ class CustomerControllerTest extends TestCase
      */
     public function test_as_an_admin_it_should_not_edit_a_customer_with_a_password_that_has_not_a_number(): void
     {
-        $customer = Customer::factory()->createOne(
-            [
-                'firstname'    => $this->faker->firstName,
-                'lastname'     => $this->faker->lastName,
-                'email'        => $this->faker->safeEmail,
-                'password'     => Hash::make($this->faker->password(8)),
-                'phone_number' => $this->faker->phoneNumber,
-                'is_suspended' => $this->faker->randomElement(['active', 'deactivate']),
-            ]
-        );
-
-        $customerID = $customer->getAttribute('id');
-
-        $payload = [
-            'password' => 'Password',
-        ];
-
-        $this->putJson(route(self::ADMIN_CUSTOMER_UPDATE, [$customerID]), $payload)
-            ->assertInvalid('password');
+        $this->putJson(
+            route(self::ADMIN_CUSTOMER_UPDATE, [$this->customer->id]),
+            ['password' => 'Password']
+        )->assertInvalid('password');
     }
 
     /**
@@ -134,25 +109,10 @@ class CustomerControllerTest extends TestCase
      */
     public function test_as_an_admin_it_should_not_edit_a_customer_with_a_password_that_is_less_than_8_characters(): void
     {
-        $customer = Customer::factory()->createOne(
-            [
-                'firstname'    => $this->faker->firstName,
-                'lastname'     => $this->faker->lastName,
-                'email'        => $this->faker->safeEmail,
-                'password'     => Hash::make($this->faker->password(8)),
-                'phone_number' => $this->faker->phoneNumber,
-                'is_suspended' => $this->faker->randomElement(['active', 'deactivate']),
-            ]
-        );
-
-        $customerID = $customer->getAttribute('id');
-
-        $payload = [
-            'password' => $this->faker->password(6, 7),
-        ];
-
-        $this->putJson(route(self::ADMIN_CUSTOMER_UPDATE, [$customerID]), $payload)
-            ->assertInvalid('password');
+        $this->putJson(
+            route(self::ADMIN_CUSTOMER_UPDATE, [$this->customer->id]),
+            ['password' => $this->faker->password(6, 7)]
+        )->assertInvalid('password');
     }
 
     /**
@@ -162,25 +122,10 @@ class CustomerControllerTest extends TestCase
      */
     public function test_as_an_admin_it_should_not_edit_a_customer_with_a_duplicate_email(): void
     {
-        $customer = Customer::factory()->createOne(
-            [
-                'firstname'    => $this->faker->firstName,
-                'lastname'     => $this->faker->lastName,
-                'email'        => $this->faker->safeEmail,
-                'password'     => Hash::make($this->faker->password(8)),
-                'phone_number' => $this->faker->phoneNumber,
-                'is_suspended' => $this->faker->randomElement(['active', 'deactivate']),
-            ]
-        );
-
-        $customerID = $customer->getAttribute('id');
-
-        $payload = [
-            'email' => $customer->getAttribute('email'),
-        ];
-
-        $this->putJson(route(self::ADMIN_CUSTOMER_UPDATE, [$customerID]), $payload)
-            ->assertInvalid('email');
+        $this->putJson(
+            route(self::ADMIN_CUSTOMER_UPDATE, [$this->customer->id]),
+            ['email' => $this->customer->email]
+        )->assertInvalid('email');
     }
 
     /**
@@ -190,25 +135,10 @@ class CustomerControllerTest extends TestCase
      */
     public function test_as_an_admin_it_should_not_edit_a_customer_with_an_invalid_email(): void
     {
-        $customer = Customer::factory()->createOne(
-            [
-                'firstname'    => $this->faker->firstName,
-                'lastname'     => $this->faker->lastName,
-                'email'        => $this->faker->safeEmail,
-                'password'     => Hash::make($this->faker->password(8)),
-                'phone_number' => $this->faker->phoneNumber,
-                'is_suspended' => $this->faker->randomElement(['active', 'deactivate']),
-            ]
-        );
-
-        $customerID = $customer->getAttribute('id');
-
-        $payload = [
-            'email' => $this->faker->name,
-        ];
-
-        $this->putJson(route(self::ADMIN_CUSTOMER_UPDATE, [$customerID]), $payload)
-            ->assertInvalid('email');
+        $this->putJson(
+            route(self::ADMIN_CUSTOMER_UPDATE, [$this->customer->id]),
+            ['email' => $this->faker->name]
+        )->assertInvalid('email');
     }
 
     /**
@@ -218,19 +148,6 @@ class CustomerControllerTest extends TestCase
      */
     public function test_as_an_admin_it_should_not_edit_a_customer_with_invalid_inputs(): void
     {
-        $customer = Customer::factory()->createOne(
-            [
-                'firstname'    => $this->faker->firstName,
-                'lastname'     => $this->faker->lastName,
-                'email'        => $this->faker->safeEmail,
-                'password'     => Hash::make($this->faker->password(8)),
-                'phone_number' => $this->faker->phoneNumber,
-                'is_suspended' => $this->faker->randomElement(['active', 'deactivate']),
-            ]
-        );
-
-        $customerID = $customer->getAttribute('id');
-
         $payload = [
             'firstname'    => $this->faker->numberBetween(4, 12),
             'lastname'     => $this->faker->numberBetween(4, 12),
@@ -238,8 +155,10 @@ class CustomerControllerTest extends TestCase
             'is_suspended' => $this->faker->numberBetween(4, 12),
         ];
 
-        $this->putJson(route(self::ADMIN_CUSTOMER_UPDATE, [$customerID]), $payload)
-            ->assertInvalid(['firstname', 'lastname', 'phone_number', 'is_suspended']);
+        $this->putJson(
+            route(self::ADMIN_CUSTOMER_UPDATE, [$this->customer->id]),
+            $payload
+        )->assertInvalid(['firstname', 'lastname', 'phone_number', 'is_suspended']);
     }
 
     /**
@@ -249,30 +168,10 @@ class CustomerControllerTest extends TestCase
      */
     public function test_as_an_admin_it_should_edit_a_customer_with_valid_inputs(): void
     {
-        $customer = Customer::factory()->createOne(
-            [
-                'firstname'    => $this->faker->firstName,
-                'lastname'     => $this->faker->lastName,
-                'email'        => $this->faker->safeEmail,
-                'password'     => Hash::make($this->faker->password(8)),
-                'phone_number' => $this->faker->phoneNumber,
-                'is_suspended' => $this->faker->randomElement(['active', 'deactivate']),
-            ]
-        );
-
-        $customerID = $customer->getAttribute('id');
-
-        $payload = [
-            'firstname'    => $this->faker->firstName,
-            'lastname'     => $this->faker->lastName,
-            'email'        => $this->faker->safeEmail,
-            'password'     => 'Pass1234',
-            'phone_number' => $this->faker->phoneNumber,
-            'is_suspended' => $this->faker->randomElement(['active', 'deactivate']),
-        ];
-
-        $this->putJson(route(self::ADMIN_CUSTOMER_UPDATE, [$customerID]), $payload)
-            ->assertSuccessful();
+        $this->putJson(
+            route(self::ADMIN_CUSTOMER_UPDATE, [$this->customer->id]),
+            $this->payload->getAttributes()
+        )->assertSuccessful();
     }
 
     /**
@@ -302,7 +201,9 @@ class CustomerControllerTest extends TestCase
     {
         $count = 30;
 
-        Customer::factory()->count($count)->create();
+        $this->customer->delete();
+
+        Customer::factory($count)->create();
 
         $this->getJson(
             route(self::ADMIN_CUSTOMER_INDEX),
@@ -320,17 +221,11 @@ class CustomerControllerTest extends TestCase
      */
     public function test_as_an_admin_it_should_not_create_a_customer_with_a_password_that_has_not_lowercase(): void
     {
-        $payload = [
-            'firstname'    => $this->faker->firstName(),
-            'lastname'     => $this->faker->lastName(),
-            'email'        => $this->faker->unique()->safeEmail,
-            'password'     => strtoupper($this->faker->password(8)),
-            'phone_number' => $this->faker->phoneNumber(),
-            'is_suspended' => $this->faker->randomElement(['active', 'deactivate']),
-        ];
+        $this->payload->setAttribute('password', strtoupper($this->faker->password(8)));
 
-        $this->postJson(route(self::ADMIN_CUSTOMER_STORE), $payload)
-            ->assertInvalid('password');
+        $this->postJson(
+            route(self::ADMIN_CUSTOMER_STORE), $this->payload->getAttributes()
+        )->assertInvalid('password');
     }
 
     /**
@@ -340,17 +235,11 @@ class CustomerControllerTest extends TestCase
      */
     public function test_as_an_admin_it_should_not_create_a_customer_with_a_password_that_has_not_uppercase(): void
     {
-        $payload = [
-            'firstname'    => $this->faker->firstName(),
-            'lastname'     => $this->faker->lastName(),
-            'email'        => $this->faker->unique()->safeEmail,
-            'password'     => strtolower($this->faker->password(8)),
-            'phone_number' => $this->faker->phoneNumber(),
-            'is_suspended' => $this->faker->randomElement(['active', 'deactivate']),
-        ];
+        $this->payload->setAttribute('password', strtolower($this->faker->password(8)));
 
-        $this->postJson(route(self::ADMIN_CUSTOMER_STORE), $payload)
-            ->assertInvalid('password');
+        $this->postJson(
+            route(self::ADMIN_CUSTOMER_STORE), $this->payload->getAttributes()
+        )->assertInvalid('password');
     }
 
     /**
@@ -360,17 +249,11 @@ class CustomerControllerTest extends TestCase
      */
     public function test_as_an_admin_it_should_not_create_a_customer_with_a_password_that_has_not_a_number(): void
     {
-        $payload = [
-            'firstname'    => $this->faker->firstName(),
-            'lastname'     => $this->faker->lastName(),
-            'email'        => $this->faker->unique()->safeEmail,
-            'password'     => 'Password',
-            'phone_number' => $this->faker->phoneNumber(),
-            'is_suspended' => $this->faker->randomElement(['active', 'deactivate']),
-        ];
+        $this->payload->setAttribute('password', 'Password');
 
-        $this->postJson(route(self::ADMIN_CUSTOMER_STORE), $payload)
-            ->assertInvalid('password');
+        $this->postJson(
+            route(self::ADMIN_CUSTOMER_STORE), $this->payload->getAttributes()
+        )->assertInvalid('password');
     }
 
     /**
@@ -380,17 +263,11 @@ class CustomerControllerTest extends TestCase
      */
     public function test_as_an_admin_it_should_not_create_a_customer_with_a_password_that_is_less_than_8_characters(): void
     {
-        $payload = [
-            'firstname'    => $this->faker->firstName(),
-            'lastname'     => $this->faker->lastName(),
-            'email'        => $this->faker->unique()->safeEmail,
-            'password'     => $this->faker->password(6, 7),
-            'phone_number' => $this->faker->phoneNumber(),
-            'is_suspended' => $this->faker->randomElement(['active', 'deactivate']),
-        ];
+        $this->payload->setAttribute('password', $this->faker->password(6, 7));
 
-        $this->postJson(route(self::ADMIN_CUSTOMER_STORE), $payload)
-            ->assertInvalid('password');
+        $this->postJson(
+            route(self::ADMIN_CUSTOMER_STORE), $this->payload->getAttributes()
+        )->assertInvalid('password');
     }
 
     /**
@@ -400,19 +277,11 @@ class CustomerControllerTest extends TestCase
      */
     public function test_as_an_admin_it_should_not_create_a_customer_with_a_duplicate_email(): void
     {
-        $customer = Customer::factory()->createOne();
+        $this->payload->setAttribute('email', $this->customer->email);
 
-        $payload = [
-            'firstname'    => $this->faker->firstName(),
-            'lastname'     => $this->faker->lastName(),
-            'email'        => $customer->getAttribute('email'),
-            'password'     => 'Pass1234',
-            'phone_number' => $this->faker->phoneNumber(),
-            'is_suspended' => $this->faker->randomElement(['active', 'deactivate']),
-        ];
-
-        $this->postJson(route(self::ADMIN_CUSTOMER_STORE), $payload)
-            ->assertInvalid('email');
+        $this->postJson(
+            route(self::ADMIN_CUSTOMER_STORE), $this->payload->getAttributes()
+        )->assertInvalid('email');
     }
 
     /**
@@ -422,17 +291,11 @@ class CustomerControllerTest extends TestCase
      */
     public function test_as_an_admin_it_should_not_create_a_customer_with_an_invalid_email(): void
     {
-        $payload = [
-            'firstname'    => $this->faker->firstName,
-            'lastname'     => $this->faker->lastName,
-            'email'        => $this->faker->name,
-            'password'     => 'Pass1234',
-            'phone_number' => $this->faker->phoneNumber,
-            'is_suspended' => $this->faker->randomElement(['active', 'deactivate']),
-        ];
+        $this->payload->setAttribute('email', $this->faker->name);
 
-        $this->postJson(route(self::ADMIN_CUSTOMER_STORE), $payload)
-            ->assertInvalid('email');
+        $this->postJson(
+            route(self::ADMIN_CUSTOMER_STORE), $this->payload->getAttributes()
+        )->assertInvalid('email');
     }
 
     /**
@@ -442,17 +305,14 @@ class CustomerControllerTest extends TestCase
      */
     public function test_as_an_admin_it_should_not_create_a_customer_without_required_inputs(): void
     {
-        $payload = [
-            'firstname'    => null,
-            'lastname'     => null,
-            'email'        => null,
-            'password'     => null,
-            'phone_number' => $this->faker->phoneNumber,
-            'is_suspended' => $this->faker->randomElement(['active', 'deactivate']),
-        ];
+        $this->payload->setAttribute('firstname', null);
+        $this->payload->setAttribute('lastname', null);
+        $this->payload->setAttribute('email', null);
+        $this->payload->setAttribute('password', null);
 
-        $this->postJson(route(self::ADMIN_CUSTOMER_STORE), $payload)
-            ->assertInvalid(['firstname', 'lastname', 'email', 'password']);
+        $this->postJson(
+            route(self::ADMIN_CUSTOMER_STORE), $this->payload->getAttributes()
+        )->assertInvalid(['firstname', 'lastname', 'email', 'password']);
     }
 
     /**
@@ -471,8 +331,9 @@ class CustomerControllerTest extends TestCase
             'is_suspended' => $this->faker->numberBetween(4, 12),
         ];
 
-        $this->postJson(route(self::ADMIN_CUSTOMER_STORE), $payload)
-            ->assertInvalid(['firstname', 'lastname', 'email', 'password', 'phone_number', 'is_suspended']);
+        $this->postJson(
+            route(self::ADMIN_CUSTOMER_STORE), $payload
+        )->assertInvalid(['firstname', 'lastname', 'email', 'password', 'phone_number', 'is_suspended']);
     }
 
     /**
@@ -482,19 +343,11 @@ class CustomerControllerTest extends TestCase
      */
     public function test_as_an_admin_it_should_create_a_customer_with_valid_inputs_and_insert_to_database(): void
     {
-        $payload = [
-            'firstname'    => $this->faker->firstName,
-            'lastname'     => $this->faker->lastName,
-            'email'        => $this->faker->unique()->safeEmail,
-            'password'     => 'Pass1234',
-            'phone_number' => $this->faker->phoneNumber,
-            'is_suspended' => $this->faker->randomElement(['active', 'deactivate']),
-        ];
+        $this->postJson(
+            route(self::ADMIN_CUSTOMER_STORE), $this->payload->getAttributes()
+        )->assertSuccessful();
 
-        $this->postJson(route(self::ADMIN_CUSTOMER_STORE), $payload)
-            ->assertSuccessful();
-
-        unset($payload['password']);
-        $this->assertDatabaseHas('customers', $payload);
+        unset($this->payload->password);
+        $this->assertDatabaseHas('customers', $this->payload->getAttributes());
     }
 }
