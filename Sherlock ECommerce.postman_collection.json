@@ -86,7 +86,7 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "5|7tITIFtpWqD9vSEY99oJXMVL6Vlwvk9WT0RXP9Sl",
+									"value": "2|QFjw9CnWFge2zWv00YloBWFDqJ9CxO6y8rQfmXI5",
 									"type": "string"
 								}
 							]
@@ -186,6 +186,42 @@
 							"response": []
 						},
 						{
+							"name": "List",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"page\": 2,\n    \"limit\": 3\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/admin/customers",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"admin",
+										"customers"
+									]
+								}
+							},
+							"response": []
+						},
+						{
 							"name": "Edit",
 							"request": {
 								"method": "PUT",
@@ -203,7 +239,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"firstname\": \"John\",\n    \"lastname\": \"Doe\",\n    \"email\": \"johndoe@email.com\",\n    \"password\": \"Pass1234\",\n    \"phone_number\": \"09123456789\",\n    \"is_suspended\": \"active\"\n}",
+									"raw": "{\n    \"firstname\": \"John\",\n    \"lastname\": \"Doe\",\n    \"is_suspended\": \"active\",\n    \"password\": \"Pass1234\"\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -249,42 +285,6 @@
 										"admin",
 										"customer",
 										"1"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "List",
-							"protocolProfileBehavior": {
-								"disableBodyPruning": true
-							},
-							"request": {
-								"method": "GET",
-								"header": [
-									{
-										"key": "Accept",
-										"value": "application/json",
-										"type": "text"
-									},
-									{
-										"key": "Content-Type",
-										"value": "application/json",
-										"type": "text"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n    \"page\": 2,\n    \"limit\": 3\n}"
-								},
-								"url": {
-									"raw": "{{base_url}}/admin/customers",
-									"host": [
-										"{{base_url}}"
-									],
-									"path": [
-										"admin",
-										"customers"
 									]
 								}
 							},
