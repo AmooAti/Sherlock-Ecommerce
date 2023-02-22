@@ -3,12 +3,13 @@
 namespace Tests\Feature\Http\Controllers\API\Admin;
 
 use App\Models\Admin;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
 class AuthControllerTest extends TestCase
 {
-    use WithFaker;
+    use WithFaker, RefreshDatabase;
 
     const ADMIN_LOGIN = 'admin.login';
     const ADMIN_LOGOUT = 'admin.logout';
