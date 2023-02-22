@@ -30,7 +30,9 @@ class AuthController extends Controller
                 ->json(['message' => 'The email or password are incorrect!'], 401);
         }
 
-        $authToken = $admin->createToken('auth_token', ['admin']);
+        $admin->tokens()->delete();
+
+        $authToken = $admin->createToken('api_token');
 
         $admin->last_login = $authToken->accessToken->created_at;
 
@@ -48,7 +50,7 @@ class AuthController extends Controller
      */
     public function logout(Request $request): jsonResponse
     {
-        $request->user()->currentAccessToken()->delete();
+        $request->user('admin')->tokens()->delete();
 
         return response()
             ->json(['message' => 'Logged out has been successful.']);
