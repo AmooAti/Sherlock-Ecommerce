@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "52520687-29be-4757-b158-b1f093b98e59",
+		"_postman_id": "9343c9ee-5b99-4ab2-a23a-7fe1efc9112a",
 		"name": "Sherlock ECommerce",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "7684855"
@@ -9,6 +9,33 @@
 		{
 			"name": "Customer",
 			"item": [
+				{
+					"name": "Register",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"firstname\": \"John\",\n    \"lastname\": \"Doe\",\n    \"email\": \"johndoe@email.com\",\n    \"password\": \"Pass1234\",\n    \"phone_number\": \"09123456789\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/customer/register",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"customer",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
 				{
 					"name": "Login",
 					"event": [
@@ -86,7 +113,7 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "2|QFjw9CnWFge2zWv00YloBWFDqJ9CxO6y8rQfmXI5",
+									"value": "1|FqIrYZr6sju2FTnZfPne6ulpmKfhNWU4fLpI9qvq",
 									"type": "string"
 								}
 							]
@@ -105,44 +132,29 @@
 						}
 					},
 					"response": []
+				}
+			],
+			"auth": {
+				"type": "noauth"
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
 				},
 				{
-					"name": "Register",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Accept",
-								"value": "application/json",
-								"type": "text"
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"firstname\": \"John\",\n    \"lastname\": \"Doe\",\n    \"email\": \"johndoe@email.com\",\n    \"password\": \"Pass1234\",\n    \"phone_number\": \"09123456789\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{base_url}}/customer/register",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"customer",
-								"register"
-							]
-						}
-					},
-					"response": []
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
 				}
 			]
 		},
@@ -150,27 +162,126 @@
 			"name": "Admin",
 			"item": [
 				{
+					"name": "Admin",
+					"item": [
+						{
+							"name": "Login",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"email\": \"leonard@email.com\",\n    \"password\": \"Pass0987\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/admin/login",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"admin",
+										"login"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Logout",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "28|dq7gtwmy64ZW6GPqtK6SQMSHLbwDehgPtEHM6wps",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/admin/logout",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"admin",
+										"logout"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"auth": {
+						"type": "noauth"
+					},
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						}
+					]
+				},
+				{
 					"name": "Customer",
 					"item": [
 						{
 							"name": "Create",
 							"request": {
 								"method": "POST",
-								"header": [
-									{
-										"key": "Accept",
-										"value": "application/json",
-										"type": "text"
-									},
-									{
-										"key": "Content-Type",
-										"value": "application/json",
-										"type": "text"
-									}
-								],
+								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"firstname\": \"John\",\n    \"lastname\": \"Doe\",\n    \"email\": \"johndoe@email.com\",\n    \"password\": \"Pass1234\",\n    \"phone_number\": \"09123456789\",\n    \"is_suspended\": \"deactivate\"\n}"
+									"raw": "{\n    \"firstname\": \"John\",\n    \"lastname\": \"Doe\",\n    \"email\": \"johndoe@email.com\",\n    \"password\": \"Pass1234\",\n    \"phone_number\": \"09123456789\",\n    \"is_suspended\": \"deactivate\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
 								},
 								"url": {
 									"raw": "{{base_url}}/admin/customer",
@@ -192,21 +303,15 @@
 							},
 							"request": {
 								"method": "GET",
-								"header": [
-									{
-										"key": "Accept",
-										"value": "application/json",
-										"type": "text"
-									},
-									{
-										"key": "Content-Type",
-										"value": "application/json",
-										"type": "text"
-									}
-								],
+								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"page\": 2,\n    \"limit\": 3\n}"
+									"raw": "{\n    \"page\": 1,\n    \"limit\": 3\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
 								},
 								"url": {
 									"raw": "{{base_url}}/admin/customers",
@@ -225,21 +330,10 @@
 							"name": "Edit",
 							"request": {
 								"method": "PUT",
-								"header": [
-									{
-										"key": "Accept",
-										"value": "application/json",
-										"type": "text"
-									},
-									{
-										"key": "Content-Type",
-										"value": "application/json",
-										"type": "text"
-									}
-								],
+								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"firstname\": \"John\",\n    \"lastname\": \"Doe\",\n    \"is_suspended\": \"active\",\n    \"password\": \"Pass1234\"\n}",
+									"raw": "{\n    \"firstname\": \"Richard\",\n    \"lastname\": \"Roe\",\n    \"email\": \"richardroe@gmail.com\",\n    \"is_suspended\": \"active\",\n    \"password\": \"Pass4321\"\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -264,18 +358,7 @@
 							"name": "Delete",
 							"request": {
 								"method": "DELETE",
-								"header": [
-									{
-										"key": "Accept",
-										"value": "application/json",
-										"type": "text"
-									},
-									{
-										"key": "Content-Type",
-										"value": "application/json",
-										"type": "text"
-									}
-								],
+								"header": [],
 								"url": {
 									"raw": "{{base_url}}/admin/customer/1",
 									"host": [
@@ -290,7 +373,60 @@
 							},
 							"response": []
 						}
+					],
+					"auth": {
+						"type": "bearer",
+						"bearer": [
+							{
+								"key": "token",
+								"value": "7|9twx096ydJEsYRQfHclD9qn97cn9fxHSXMeVo1M7",
+								"type": "string"
+							}
+						]
+					},
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						}
 					]
+				}
+			],
+			"auth": {
+				"type": "noauth"
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
 				}
 			]
 		}
@@ -307,7 +443,7 @@
 					"});",
 					"",
 					"pm.request.headers.add({",
-					"    key: \"Content_type\",",
+					"    key: \"Content-Type\",",
 					"    value: \"application/json\"",
 					"});"
 				]
